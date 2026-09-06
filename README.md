@@ -81,7 +81,9 @@ cd MyTransitMakers_JetpackCompose
 ### 2. Configuration Files Setup
 
 #### local.properties Configuration
-Create or edit `local.properties` in the project root (not included in Git):
+Copy `local.properties.example` to `local.properties` in the project root and
+fill it in. The template carries the same notes as this section, next to the
+keys themselves. The file is not in Git:
 
 ```properties
 sdk.dir=/path/to/your/Android/sdk

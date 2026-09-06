@@ -69,20 +69,15 @@ fun LoginContentScreen(
     }
     
     Scaffold(
+        // Removing bottomBar alone left the inset reserved and the window
+        // background showing through it as a white band
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .windowInsetsTopHeight(WindowInsets.statusBars)
                     .background(Accent)
-            )
-        },
-        bottomBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsBottomHeight(WindowInsets.navigationBars)
-                    .background(Primary)
             )
         }
     ) { paddingValues ->

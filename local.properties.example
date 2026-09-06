@@ -1,0 +1,27 @@
+# Template for the machine-local, untracked properties file.
+# Copy this to the real one and fill in the values.
+#
+# This template exists because that file was once replaced with a copy taken
+# from another project. It left sdk.dir behind and lost everything else, and
+# nothing in the repository said what had been there.
+
+# Android SDK location. Android Studio writes this on first open.
+sdk.dir=
+
+# Open Data Platform for Transportation. Not platform specific, so the SwiftUI
+# repo's Debug.xcconfig holds the same two values.
+ODPT_ACCESS_TOKEN=
+ODPT_CHALLENGE_TOKEN=
+
+# AdMob banner UNIT id for the Android app. Different from the iOS one.
+# The AdMob APP id is not here: it is in app/src/main/AndroidManifest.xml,
+# because it ships inside every copy of the app anyway.
+# verifyAdMobConfig fails every release task while this is empty.
+ADMOB_BANNER_UNIT_ID=
+
+# App Check debug secret, registered under Firebase Console -> App Check ->
+# this Android app -> Manage debug tokens. Android and iOS are separate App
+# Check apps, so the iOS token is a different value. Debug builds only;
+# release uses Play Integrity. Leave it empty and the SDK generates one per
+# install and logs it, which means registering a new token on every device.
+APP_CHECK_DEBUG_TOKEN=

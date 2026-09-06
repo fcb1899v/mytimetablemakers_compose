@@ -1,0 +1,59 @@
+rules_version = '2';
+
+// My Transit Makers (mytimetablemaker)
+//
+// One Firebase project serves two repositories: this Compose app and
+// mytimetablemaker_swiftui. The rules describe the project, not one app, so
+// they live here and the SwiftUI repo has none. Deploy from this directory.
+//
+// Shape, identical on both platforms:
+//
+//   users/{uid}                                 auth.currentUser.uid
+//     goorback/{goorback}                       one document per direction
+//       timetable/{timetableNTag}               one per timetable and calendar
+//
+// iOS  FirestoreViewModel.swift:31-33, 92
+// And  FirestoreViewModel.kt:58-60
+//
+// Sign in is email and password on both platforms, so the uid is stable and
+// identifies a person. Binding every path to it is the whole protection.
+//
+// App Check is NOT integrated in either app as of 2026-09-06. These rules have
+// to stand on their own until it is.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+
+      // Neither app deletes a document; a search for delete calls in both
+      // repositories found none. Closed rather than left open to the same
+      // condition as write, so adding deletion is a deliberate edit here.
+      allow create, update: if isOwner(uid);
+      allow delete: if false;
+
+      // goorback and timetable both hang off the owner's document, so one
+      // recursive match covers them and anything added later.
+      match /{document=**} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // Rules do not cascade, so an unmatched path is already denied. Stating it
+    // means a later edit that adds a broad match has to remove this on purpose.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+function isOwner(uid) {
+  return request.auth != null && request.auth.uid == uid;
+}
+
+// No size guard here, unlike kawaii_allowance_tracker. That app writes a known
+// handful of keys, so a ceiling catches a payload no code produces. A timetable
+// document holds a variable number of departure times, and a cap guessed from
+// outside would deny writes the app makes. Add one when the shape is measured,
+// not before.

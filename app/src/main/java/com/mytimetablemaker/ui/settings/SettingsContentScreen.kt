@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.ui.res.stringResource
+import com.mytimetablemaker.AppCheckState
 import com.mytimetablemaker.R
 import com.mytimetablemaker.extensions.*
 import com.mytimetablemaker.extensions.ScreenSize
@@ -69,6 +70,7 @@ fun SettingsContentScreen(
     
     // Login state and alert messages.
     val isLoginSuccess by loginViewModel.isLoginSuccess.collectAsState()
+    val isAppCheckReady by AppCheckState.isReady.collectAsState()
     val isShowLoginMessage by loginViewModel.isShowMessage.collectAsState()
     val loginAlertTitle by loginViewModel.alertTitle.collectAsState()
     val loginAlertMessage by loginViewModel.alertMessage.collectAsState()
@@ -88,8 +90,10 @@ fun SettingsContentScreen(
         onDispose { }
     }
     
-    // Load Route 2 setting on appear.
+    // Load Route 2 setting on appear, and give App Check another chance: the
+    // account section below stays hidden until it clears
     LaunchedEffect(Unit) {
+        AppCheckState.refresh(context)
         loadRoute2Setting(sharedPreferences) { value ->
             showRoute2 = value
         }
@@ -111,19 +115,14 @@ fun SettingsContentScreen(
     }
     
     Scaffold(
+        // Removing bottomBar alone left the inset reserved and the window
+        // background showing through it as a white band
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .windowInsetsTopHeight(WindowInsets.statusBars)
-                    .background(Primary)
-            )
-        },
-        bottomBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsBottomHeight(WindowInsets.navigationBars)
                     .background(Primary)
             )
         }
@@ -246,8 +245,9 @@ fun SettingsContentScreen(
                     }
                 }
                 
-                // Account actions.
-                SettingsSection(
+                // Account actions. Hidden while App Check is down: every entry
+                // here leads to Firestore, which rejects the call without it
+                if (isAppCheckReady) SettingsSection(
                     title = stringResource(R.string.account)
                 ) {
                     if (isLoginSuccess) {

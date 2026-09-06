@@ -13,11 +13,14 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
 import com.mytimetablemaker.extensions.ScreenSize
 import com.mytimetablemaker.R
 import kotlinx.coroutines.delay
@@ -37,6 +40,10 @@ fun AdMobBannerView(
     // Resolve the AdMob unit ID from resources or local.properties.
     val adUnitID = remember { getAdUnitID(context) }
     val bannerHeight = ScreenSize.admobBannerHeight()
+    // Inline adaptive takes the width the container actually has and a ceiling,
+    // where AdSize.BANNER asked for a fixed 320 inside a full width box
+    val bannerWidthDp = LocalConfiguration.current.screenWidthDp
+    val bannerHeightDp = bannerHeight.value.toInt()
     
     // Defer first ad load to avoid blocking initial composition.
     LaunchedEffect(Unit) {
@@ -48,7 +55,21 @@ fun AdMobBannerView(
         factory = { ctx ->
             val adView = AdView(ctx)
             adView.adUnitId = adUnitID
-            adView.setAdSize(AdSize.BANNER)
+            adView.setAdSize(AdSize.getInlineAdaptiveBannerAdSize(bannerWidthDp, bannerHeightDp))
+            // Inline adaptive can come back shorter than the ceiling, and the
+            // box is fixed at bannerHeight, so report both
+            adView.adListener = object : AdListener() {
+                override fun onAdLoaded() {
+                    Log.d(
+                        "AdSize",
+                        "AdSize: $bannerWidthDp x cap $bannerHeightDp / served: ${adView.adSize?.width} x ${adView.adSize?.height}"
+                    )
+                }
+
+                override fun onAdFailedToLoad(error: LoadAdError) {
+                    Log.w("AdSize", "failed to load: ${error.message}")
+                }
+            }
             adView
         },
         update = { adView ->
@@ -63,6 +84,8 @@ fun AdMobBannerView(
         },
         modifier = Modifier
             .fillMaxWidth()
+            // Held at the ceiling, matching the iOS app and the Flutter apps. A
+            // shorter creative shows as empty space below it
             .height(bannerHeight)
             .then(modifier)
     )
@@ -96,6 +119,8 @@ private fun getAdUnitID(context: Context): String {
     }
     
     // Fallback to the test unit ID.
+    // Adaptive banners have their own demo unit. The fixed size one (6300978111)
+    // only serves 320x50, which makes every adaptive size look like 320x50
     Log.w("AdMobBannerView", "Using test AdMob banner unit ID; configure ADMOB_BANNER_UNIT_ID.")
-    return "ca-app-pub-3940256099942544/6300978111"
+    return "ca-app-pub-3940256099942544/9214589741"
 }

@@ -12,7 +12,7 @@
 ![Kotlin](https://img.shields.io/badge/Language-Kotlin-purple)
 ![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-blue)
 ![Min SDK](https://img.shields.io/badge/Min%20SDK-24-orange)
-![Target SDK](https://img.shields.io/badge/Target%20SDK-36-orange)
+![Target SDK](https://img.shields.io/badge/Target%20SDK-37-orange)
 
 ## 📱 Application Overview
 
@@ -60,8 +60,11 @@ My Transit Makers is a Jetpack Compose-based Android application that helps user
 ## 📋 Prerequisites
 
 - Android Studio Hedgehog (2023.1.1) or later
-- JDK 11
-- Android SDK 24+
+- JDK 21. Not 26: its `jlink` cannot transform the Android SDK's
+  `core-for-system-modules.jar`, so the build stops before it compiles anything.
+  Point Gradle at 21 with `org.gradle.java.home` in your user Gradle config
+- Android SDK 24+ (compileSdk and targetSdk are 37)
+- Gradle 9.5.0, Android Gradle Plugin 9.3.0, Kotlin 2.4.10
 - Firebase project setup
 - Google Mobile Ads account
 - ODPT API access token (optional, for real-time railway data)
@@ -84,14 +87,55 @@ Create or edit `local.properties` in the project root (not included in Git):
 sdk.dir=/path/to/your/Android/sdk
 ODPT_ACCESS_TOKEN=your_odpt_api_token
 ODPT_CHALLENGE_TOKEN=your_odpt_challenge_token
-ADMOB_APP_ID=ca-app-pub-xxxxxxxx~xxxxxxxx
 ADMOB_BANNER_UNIT_ID=ca-app-pub-xxxxxxxx/xxxxxxxx
+APP_CHECK_DEBUG_TOKEN=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
+
+`APP_CHECK_DEBUG_TOKEN` is the App Check debug secret, registered under Firebase
+Console -> App Check -> this Android app -> Manage debug tokens. Android and iOS
+are separate App Check apps, so the iOS token in the SwiftUI repo is a different
+value. Leave it out and the SDK generates one per install and logs it, which
+means registering a new token on every device. Debug builds only; release uses
+Play Integrity.
+
+The AdMob **app** id is not here: it is written out in
+`app/src/main/AndroidManifest.xml`. It ships inside every copy of the app, so
+keeping it in an untracked file protected nothing and left the value existing on
+one machine only. Only the **unit** id stays here.
+
+`verifyAdMobConfig` is wired into every release task
+(`app/build.gradle.kts:129`) and throws when `ADMOB_BANNER_UNIT_ID` is missing,
+so a release cannot fall back to the test unit unnoticed. Debug builds use
+Google's test unit and need nothing.
+
+Confirmed on 2026-09-03 that the task joins the graph:
+
+```
+$ ./gradlew :app:bundleRelease --dry-run
+:app:buildReleasePreBundle SKIPPED
+:app:verifyAdMobConfig SKIPPED
+BUILD SUCCESSFUL
+```
+
+Exercised on 2026-09-06, after the file was accidentally overwritten with a
+copy from another project and every key but `sdk.dir` was lost:
+
+```
+$ ./gradlew :app:verifyAdMobConfig
+> Missing from local.properties: ADMOB_BANNER_UNIT_ID.
+  A release build must not fall back to AdMob test ids.
+BUILD FAILED
+```
+
+The guard holds. **Keep a copy of this file outside the project.** It is
+machine-local and untracked, so losing it costs the ODPT tokens and the AdMob
+unit id too, and nothing in the repository can restore them.
 
 ### 3. Firebase Configuration
 1. Create a Firebase project
 2. Place `google-services.json` in the `app/` directory
-3. This file is automatically excluded by .gitignore
+3. This file is tracked here: the build needs it, and it holds only
+   identifiers that ship inside the app. Real secrets stay out
 
 ### 4. Build and Run
 ```bash

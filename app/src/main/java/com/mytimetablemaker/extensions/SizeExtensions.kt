@@ -104,7 +104,15 @@ object ScreenSize {
     @Composable
     fun admobBannerMinWidth(): Dp = 320.dp
     @Composable
-    fun admobBannerHeight(): Dp = if (screenHeight() * 0.05f < 50.dp) 50.dp else screenHeight() * 0.05f
+    // Same shape the Flutter apps use, so one banner decision covers the studio
+    fun admobBannerHeight(): Dp {
+        val h = screenHeight()
+        return when {
+            h < 600.dp -> 50.dp
+            h < 1000.dp -> 50.dp + (h - 600.dp) / 8f
+            else -> 100.dp
+        }
+    }
 
     // Login screen sizing.
     @Composable

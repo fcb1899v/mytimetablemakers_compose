@@ -53,6 +53,10 @@ captures/
 .idea/caches
 .idea/modules.xml
 .idea/navEditor.xml
+# The rest of .idea goes too (2026-09-19). What is left in it records this
+# machine: which emulator was picked, which target was deployed to last. Android
+# Studio writes them all back when the project is opened
+.idea/
 
 # Keystore files
 key.properties

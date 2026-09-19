@@ -121,3 +121,11 @@ lint/tmp/
 *.mobileprovision
 *.provisionprofile
 .idea/markdown.xml
+
+# --- Firebase configuration (added 2026-09-19) ---
+# Anything regenerable stays out. These files are downloaded from the Firebase
+# console rather than written by hand, so tracking them only publishes the
+# project identifiers into a repository that is scanned automatically.
+app/google-services.json
+firebase.json
+.firebaserc

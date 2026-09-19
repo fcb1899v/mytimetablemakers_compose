@@ -93,53 +93,32 @@ ADMOB_BANNER_UNIT_ID=ca-app-pub-xxxxxxxx/xxxxxxxx
 APP_CHECK_DEBUG_TOKEN=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-`APP_CHECK_DEBUG_TOKEN` is the App Check debug secret, registered under Firebase
-Console -> App Check -> this Android app -> Manage debug tokens. Android and iOS
-are separate App Check apps, so the iOS token in the SwiftUI repo is a different
-value. Leave it out and the SDK generates one per install and logs it, which
-means registering a new token on every device. Debug builds only; release uses
-Play Integrity.
+`APP_CHECK_DEBUG_TOKEN` is the App Check debug secret, registered under Firebase Console -> App Check -> this Android app -> Manage debug tokens.
+Android and iOS are separate App Check apps, so the iOS token in the SwiftUI repository is a different value.
+Leave it out and the SDK generates one per install and logs it, which means registering a new token on every device.
+It is read in debug builds only, because release builds use Play Integrity.
 
-The AdMob **app** id is not here: it is written out in
-`app/src/main/AndroidManifest.xml`. It ships inside every copy of the app, so
-keeping it in an untracked file protected nothing and left the value existing on
-one machine only. Only the **unit** id stays here.
+The AdMob **app** id is not kept here: it is written out in `app/src/main/AndroidManifest.xml`.
+It ships inside every copy of the app, so keeping it in an untracked file protects nothing.
+Only the **unit** id stays in the properties file.
 
-`verifyAdMobConfig` is wired into every release task
-(`app/build.gradle.kts:129`) and throws when `ADMOB_BANNER_UNIT_ID` is missing,
-so a release cannot fall back to the test unit unnoticed. Debug builds use
-Google's test unit and need nothing.
-
-Confirmed on 2026-09-03 that the task joins the graph:
-
-```
-$ ./gradlew :app:bundleRelease --dry-run
-:app:buildReleasePreBundle SKIPPED
-:app:verifyAdMobConfig SKIPPED
-BUILD SUCCESSFUL
-```
-
-Exercised on 2026-09-06, after the file was accidentally overwritten with a
-copy from another project and every key but `sdk.dir` was lost:
-
-```
-$ ./gradlew :app:verifyAdMobConfig
-> Missing from local.properties: ADMOB_BANNER_UNIT_ID.
-  A release build must not fall back to AdMob test ids.
-BUILD FAILED
-```
-
-The guard holds. **Keep a copy of this file outside the project.** It is
-machine-local and untracked, so losing it costs the ODPT tokens and the AdMob
-unit id too, and nothing in the repository can restore them.
+Keep a copy of the filled-in file outside the project.
+It is machine-local and untracked, so nothing in the repository can restore the ODPT tokens or the AdMob unit id.
 
 ### 3. Firebase Configuration
-1. Create a Firebase project
-2. Place `google-services.json` in the `app/` directory
-3. This file is tracked here: the build needs it, and it holds only
-   identifiers that ship inside the app. Real secrets stay out
+
+1. Create a Firebase project and enable Email/Password authentication.
+2. Download `google-services.json` from the Firebase console (Project settings > Your apps) and place it in the `app/` directory.
+   It left the repository on 2026-09-19: anything the console hands back on request stays out, so a project's identifiers are never published for nothing.
+   The `com.google.gms.google-services` plugin fails the build without it, so a fresh clone has to download it first.
+3. Deploy the Firestore rules in `firestore.rules`.
+   ```bash
+   firebase deploy --only firestore:rules --project <PROJECT_ID>
+   ```
+4. Register the App Check providers: the debug token above for emulators, Play Integrity for release.
 
 ### 4. Build and Run
+
 ```bash
 ./gradlew assembleDebug
 ```

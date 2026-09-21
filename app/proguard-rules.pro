@@ -65,17 +65,8 @@
 -renamesourcefileattribute SourceFile
 
 # ---------------------------------------------------------------------------
-# Room (transitive: play-services-ads-api -> androidx.work:work-runtime:2.7.0
-# -> androidx.room:room-runtime:2.2.5)
+# Room (transitive: play-services-ads-api -> work-runtime 2.7.0 -> room-runtime 2.2.5)
 # ---------------------------------------------------------------------------
-# room-runtime 2.2.5 ships only "-keep class * extends androidx.room.RoomDatabase"
-# in its own proguard.txt. That keeps the class but not its members, so R8
-# removes the no-arg constructor of the generated WorkDatabase_Impl.
-# Room.getGeneratedImplementation then finds the class but Class.newInstance()
-# throws InstantiationException, which Room rewraps as
-# "Failed to create an instance of androidx.work.impl.WorkDatabase". That is
-# thrown from androidx.startup.InitializationProvider.onCreate, i.e. inside
-# handleBindApplication, so the process dies before any Activity starts: the
-# release build of 2.0.3 never showed a screen. Newer Room versions add the
-# "{ <init>(); }" member spec themselves; 2.2.5 does not, so keep it here.
+# room-runtime 2.2.5 keeps RoomDatabase classes but not their members, so R8 removes the WorkDatabase_Impl no-arg constructor.
+# Startup then dies before any Activity with "Failed to create an instance of androidx.work.impl.WorkDatabase", which newer Room avoids by adding this "{ <init>(); }" spec itself.
 -keep class * extends androidx.room.RoomDatabase { <init>(); }

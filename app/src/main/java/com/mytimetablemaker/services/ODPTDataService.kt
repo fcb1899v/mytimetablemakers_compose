@@ -193,8 +193,7 @@ object ODPTParser {
                                         else null
                                     }
                                     else -> {
-                                        // Skip non-primitive elements: some ODPT fields
-                                        // hold objects here that the app does not need
+                                        // Skip non-primitive elements: some ODPT fields hold objects here that the app does not need.
                                         null
                                     }
                                 }

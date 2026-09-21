@@ -90,8 +90,7 @@ fun SettingsContentScreen(
         onDispose { }
     }
     
-    // Load Route 2 setting on appear, and give App Check another chance: the
-    // account section below stays hidden until it clears
+    // Load Route 2 setting on appear, and give App Check another chance: the account section below stays hidden until it clears.
     LaunchedEffect(Unit) {
         AppCheckState.refresh(context)
         loadRoute2Setting(sharedPreferences) { value ->
@@ -115,8 +114,7 @@ fun SettingsContentScreen(
     }
     
     Scaffold(
-        // Removing bottomBar alone left the inset reserved and the window
-        // background showing through it as a white band
+        // Removing bottomBar alone left the inset reserved and the window background showing through it as a white band.
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             Box(
@@ -245,8 +243,8 @@ fun SettingsContentScreen(
                     }
                 }
                 
-                // Account actions. Hidden while App Check is down: every entry
-                // here leads to Firestore, which rejects the call without it
+                // Account actions.
+                // Hidden while App Check is down: every entry here leads to Firestore, which rejects the call without it.
                 if (isAppCheckReady) SettingsSection(
                     title = stringResource(R.string.account)
                 ) {

@@ -1134,13 +1134,13 @@ class SettingsLineViewModel(
         showArrivalSuggestions.value = shouldShow
     }
     
-    // Unified filtering logic for both railway stations and bus stops
-    // isDeparture: true for departure stops, false for arrival stops
+    // Unified filtering logic for both railway stations and bus stops.
+    // isDeparture is true for departure stops and false for arrival stops.
     private fun filterStops(lineInput: String, excludeStop: TransportationStop?, isDeparture: Boolean): List<TransportationStop> {
         var filtered: List<TransportationStop> = _lineStops.value
         
-        // Order constraint only for bus lines (departure before arrival);
-        // railway lines allow any station selection
+        // Order constraint only for bus lines (departure before arrival).
+        // Railway lines allow any station selection.
         val isRailway = _selectedLine.value?.kind == TransportationLineKind.RAILWAY || 
             selectedTransportationKind.value == TransportationLineKind.RAILWAY
         

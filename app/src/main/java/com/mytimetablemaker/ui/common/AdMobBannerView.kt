@@ -40,8 +40,7 @@ fun AdMobBannerView(
     // Resolve the AdMob unit ID from resources or local.properties.
     val adUnitID = remember { getAdUnitID(context) }
     val bannerHeight = ScreenSize.admobBannerHeight()
-    // Inline adaptive takes the width the container actually has and a ceiling,
-    // where AdSize.BANNER asked for a fixed 320 inside a full width box
+    // Inline adaptive takes the container's actual width and a ceiling; AdSize.BANNER asked for a fixed 320 in a full width box.
     val bannerWidthDp = LocalConfiguration.current.screenWidthDp
     val bannerHeightDp = bannerHeight.value.toInt()
     
@@ -56,8 +55,7 @@ fun AdMobBannerView(
             val adView = AdView(ctx)
             adView.adUnitId = adUnitID
             adView.setAdSize(AdSize.getInlineAdaptiveBannerAdSize(bannerWidthDp, bannerHeightDp))
-            // Inline adaptive can come back shorter than the ceiling, and the
-            // box is fixed at bannerHeight, so report both
+            // Inline adaptive can come back shorter than the ceiling, and the box is fixed at bannerHeight, so report both.
             adView.adListener = object : AdListener() {
                 override fun onAdLoaded() {
                     Log.d(
@@ -84,8 +82,8 @@ fun AdMobBannerView(
         },
         modifier = Modifier
             .fillMaxWidth()
-            // Held at the ceiling, matching the iOS app and the Flutter apps. A
-            // shorter creative shows as empty space below it
+            // Held at the ceiling, matching the iOS app and the Flutter apps.
+            // A shorter creative shows as empty space below it.
             .height(bannerHeight)
             .then(modifier)
     )
@@ -118,8 +116,8 @@ private fun getAdUnitID(context: Context): String {
         }
     }
     
-    // Fallback to the adaptive test unit. The fixed size one (6300978111) only
-    // serves 320x50, which makes every adaptive size look like 320x50
+    // Fallback to the adaptive test unit.
+    // The fixed size one (6300978111) only serves 320x50, which makes every adaptive size look like 320x50.
     Log.w("AdMobBannerView", "Using test AdMob banner unit ID; configure ADMOB_BANNER_UNIT_ID.")
     return "ca-app-pub-3940256099942544/9214589741"
 }

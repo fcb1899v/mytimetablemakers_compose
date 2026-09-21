@@ -48,8 +48,7 @@ class MainActivity : ComponentActivity() {
         }
     }
     
-    // Coming back from background is the one moment the network can change
-    // without the app doing anything
+    // Coming back from background is the one moment the network can change without the app doing anything.
     override fun onResume() {
         super.onResume()
         AppCheckState.refresh(this)

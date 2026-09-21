@@ -69,8 +69,7 @@ fun LoginContentScreen(
     }
     
     Scaffold(
-        // Removing bottomBar alone left the inset reserved and the window
-        // background showing through it as a white band
+        // Removing bottomBar alone left the inset reserved and the window background showing through it as a white band.
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             Box(

@@ -39,8 +39,8 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 # KTX was merged into the main modules; the -ktx artifacts are gone from the BOM
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
-# No version.ref: the BoM above pins it. The -ktx variant is not used because
-# the Kotlin extensions were folded into the main artifact
+# No version.ref because the BoM above pins it.
+# The -ktx variant is not used because the Kotlin extensions were folded into the main artifact.
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-appcheck-playintegrity = { group = "com.google.firebase", name = "firebase-appcheck-playintegrity" }
 firebase-appcheck-debug = { group = "com.google.firebase", name = "firebase-appcheck-debug" }

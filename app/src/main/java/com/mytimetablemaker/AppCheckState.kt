@@ -3,8 +3,6 @@ package com.mytimetablemaker
 import android.content.Context
 import android.util.Log
 import com.google.firebase.appcheck.FirebaseAppCheck
-import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
-import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -21,9 +19,8 @@ object AppCheckState {
     private fun isValidJwt(token: String?): Boolean =
         token != null && token.split(".").let { it.size == 3 && it.none(String::isEmpty) }
 
-    // Staged, not the same call repeated: a stale cache is fixed by forcing a
-    // refresh, and a provider that never installed is fixed by installing it
-    // again. Repeating one call just repeats one failure
+    // Staged, not the same call repeated: a stale cache needs a forced refresh,
+    // a provider that never installed needs installing again
     fun refresh(context: Context) {
         if (_isReady.value) return
         token(forceRefresh = false) { cached ->
@@ -36,20 +33,10 @@ object AppCheckState {
         }
     }
 
-    // Installed at launch and again as the last stage above
+    // Installed at launch and again as the last stage above. appCheckProviderFactory()
+    // has one copy per source set: firebase-appcheck-debug is debugImplementation only.
     fun install(context: Context) {
-        FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
-            if (BuildConfig.DEBUG) {
-                // The secret comes from AppCheckDebugSecretRegistrar, which the
-                // SDK asks through its component graph
-                if (BuildConfig.APP_CHECK_DEBUG_TOKEN.isEmpty()) {
-                    Log.w(TAG, "No APP_CHECK_DEBUG_TOKEN in local.properties; the SDK will generate one")
-                }
-                DebugAppCheckProviderFactory.getInstance()
-            } else {
-                PlayIntegrityAppCheckProviderFactory.getInstance()
-            }
-        )
+        FirebaseAppCheck.getInstance().installAppCheckProviderFactory(appCheckProviderFactory())
     }
 
     private fun settle(token: String?) {

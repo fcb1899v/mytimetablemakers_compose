@@ -791,9 +791,8 @@ class SettingsLineViewModel(
         }
     }
     
-    // Load station settings from SharedPreferences
-    // Split by ":" and return first component for ODPT format
-    // Also restore _selectedDepartureStop and _selectedArrivalStop so isAllNotEmpty becomes true when reopening the sheet
+    // Load station settings from SharedPreferences (ODPT format: first ":" component).
+    // Also restores the selected stops so isAllNotEmpty is true when reopening the sheet
     private fun loadStationSettings() {
         val currentLineIndex = _selectedLineNumber.value - 1
         val context = getApplication<Application>()
@@ -1140,9 +1139,8 @@ class SettingsLineViewModel(
     private fun filterStops(lineInput: String, excludeStop: TransportationStop?, isDeparture: Boolean): List<TransportationStop> {
         var filtered: List<TransportationStop> = _lineStops.value
         
-        // Filter by order: if excludeStop is selected, apply order constraint
-        // Railway lines: skip order constraint (allow any station selection)
-        // Bus lines: apply order constraint (departure must be before arrival)
+        // Order constraint only for bus lines (departure before arrival);
+        // railway lines allow any station selection
         val isRailway = _selectedLine.value?.kind == TransportationLineKind.RAILWAY || 
             selectedTransportationKind.value == TransportationLineKind.RAILWAY
         
@@ -1238,9 +1236,7 @@ class SettingsLineViewModel(
         
         // Note: operatorInput.value is already updated in onOperatorInputChanged
         
-        // Trigger filtering when operatorInput changes (always filter, regardless of selection state)
-        // Pass isFocused = isOperatorFieldFocused.value to maintain focus state
-        // Wait for filterOperators to complete
+        // Always filter on operatorInput changes, keeping the current focus state
         filterOperators(newValue, isFocused = isOperatorFieldFocused.value)
         
         // Re-filter lines without operator filter if needed

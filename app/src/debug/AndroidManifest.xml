@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+        <!-- Supplies the App Check debug secret. Registered here rather than in
+             src/main because AppCheckDebugSecretRegistrar only exists in the
+             debug source set: pointing Firebase's component discovery at a class
+             that is absent from a release build is a launch-time failure. -->
+        <service
+            android:name="com.google.firebase.components.ComponentDiscoveryService"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="com.google.firebase.components:com.mytimetablemaker.AppCheckDebugSecretRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
+        </service>
+    </application>
+
+</manifest>

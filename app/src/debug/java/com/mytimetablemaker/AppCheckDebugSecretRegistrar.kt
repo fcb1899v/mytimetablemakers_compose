@@ -5,9 +5,8 @@ import com.google.firebase.appcheck.debug.InternalDebugSecretProvider
 import com.google.firebase.components.Component
 import com.google.firebase.components.ComponentRegistrar
 
-// DebugAppCheckProviderFactory takes no token on Android. The SDK asks its
-// component graph for one instead, which is how the Flutter plugin supplies the
-// value the other apps keep in .env. Registered in AndroidManifest.
+// DebugAppCheckProviderFactory takes no token on Android: the SDK asks its
+// component graph for one instead. Registered in AndroidManifest.
 @Keep
 class AppCheckDebugSecretRegistrar : ComponentRegistrar, InternalDebugSecretProvider {
 

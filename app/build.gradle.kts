@@ -40,15 +40,13 @@ android {
         applicationId = "com.mytimetablemaker"
         minSdk = 24
         targetSdk = 37
-        versionCode = 57
-        versionName = "2.0.3"
+        versionCode = 58
+        versionName = "2.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        // The AdMob app id is not injected here any more: it is written out in
-        // AndroidManifest.xml. It ships inside every copy of the app, so hiding
-        // it in local.properties protected nothing and left the value existing
-        // on one machine only. Unit ids stay in local.properties.
+        // The AdMob app id is written in AndroidManifest.xml: it ships in every copy
+        // of the app, so hiding it protected nothing. Unit ids stay in local.properties.
 
         // Get ODPT Access Token from local.properties and set in BuildConfig
         val odptAccessToken = localProperties.getProperty("ODPT_ACCESS_TOKEN") ?: ""
@@ -62,8 +60,7 @@ android {
     buildTypes {
         debug {
             // Adaptive banners have their own demo unit. The fixed size one
-            // (6300978111) only serves 320x50, which makes every adaptive size
-            // measured against it look like 320x50
+            // (6300978111) only serves 320x50, so every adaptive size measures as 320x50
             resValue("string", "admob_banner_unit_id", "ca-app-pub-3940256099942544/9214589741")
             // App Check debug secret, so one registered token covers every
             // device instead of the SDK generating one per install
@@ -80,14 +77,14 @@ android {
             buildConfigField("String", "APP_CHECK_DEBUG_TOKEN", "\"\"")
             isMinifyEnabled = true
             isShrinkResources = true
+            // No ndk.debugSymbolLevel on purpose: the only .so files come from
+            // dependencies and carry no symbols, so SYMBOL_TABLE emits an empty dir
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Falls back to the test unit so that configuring the project
-            // still works without local.properties. The fallback is what let
-            // this app ship test ads unnoticed, so verifyAdMobConfig below
-            // stops the release before it can be packaged again
+            // Falls back to the test unit so configuring works without
+            // local.properties. verifyAdMobConfig below stops a release built this way
             val admobBannerUnitId = localProperties.getProperty("ADMOB_BANNER_UNIT_ID")
                 ?: "ca-app-pub-3940256099942544/9214589741"
 
@@ -96,8 +93,7 @@ android {
         }
     }
     // 17, the same as the eight Flutter apps. AGP 8 and later require it, and
-    // Java 11 is not installed on the build machine any more, so the toolchain
-    // below could not resolve and the build stopped before compiling.
+    // Java 11 is no longer installed on the build machine.
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -109,21 +105,16 @@ android {
     }
 }
 
-// No jvmToolchain: it demands a JDK of exactly that version be installed, and
-// this machine has 21 and 26. The eight Flutter apps set the target instead
-// and let the running JDK cross compile, which is what compileOptions above
-// and jvmTarget below do.
+// No jvmToolchain: it demands a JDK of exactly that version. compileOptions above
+// and jvmTarget below set the target and let the running JDK cross compile instead.
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 
-// Test ads look exactly like real ones and earn nothing, so an app built
-// without the real unit id has no symptom at all: it simply never appears in
-// AdMob reporting, which reads the same as an app nobody uses. This app
-// shipped that way. The check runs only for release outputs, so debug builds
-// and IDE syncs still work without local.properties
+// Test ads look like real ones and earn nothing, so a build without the real unit
+// id has no symptom. Runs only for release outputs so debug builds work without it
 val verifyAdMobConfig = tasks.register("verifyAdMobConfig") {
     doLast {
         val missing = listOf("ADMOB_BANNER_UNIT_ID")
@@ -157,8 +148,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
-    // Measurement stopped on 2025-11-23 and the app has been shipping blind
-    // since. Analytics needs no call sites: first_open, session_start and
+    // Analytics needs no call sites: first_open, session_start and
     // user_engagement are collected once the dependency is on the classpath
     implementation(libs.firebase.analytics)
     // App Check. Firestore holds one document tree per signed in user and the

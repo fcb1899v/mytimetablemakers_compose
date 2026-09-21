@@ -14,7 +14,11 @@
 bin/
 gen/
 out/
-release/
+# Anchored to the signed-bundle output directory. A bare "release/" matches any
+# directory of that name at any depth, which silently excluded the
+# app/src/release/ source set: the release variant of AppCheckProviderFactory.kt
+# existed on disk and built locally, but would never have been committed.
+/app/release/
 
 # Gradle files
 .gradle/

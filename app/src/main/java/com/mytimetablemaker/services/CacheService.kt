@@ -116,12 +116,10 @@ class SharedDataManager private constructor(private val application: Application
     private val initializedKinds = mutableSetOf<TransportationLineKind>()
     private val cache = CacheStore(application)
     private val odptService = ODPTDataService(application)
-    // GTFS bootstrap is intentionally disabled for now.
-    // To restore quickly, uncomment these lines and GTFS branches below.
+    // GTFS bootstrap is intentionally disabled: it is excluded from this selector too.
+    // To restore, uncomment the two lines below and the GTFS branches further down.
     // private val gtfsService = GTFSDataService(application)
     // private val consumerKey: String = BuildConfig.ODPT_ACCESS_TOKEN
-    // GTFS operators are currently excluded from cache bootstrap.
-    // To resume GTFS bootstrap later, include GTFS operators in this selector.
     private fun activeOperatorsForKind(kind: TransportationLineKind): List<LocalDataSource> {
         return LocalDataSource.entries.filter { operator ->
             operator.transportationType() == kind.toTransportationKind() &&

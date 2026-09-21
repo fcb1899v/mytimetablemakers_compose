@@ -193,9 +193,8 @@ object ODPTParser {
                                         else null
                                     }
                                     else -> {
-                                        // Skip non-primitive elements in array
-                                        // This is expected for some ODPT API fields that may contain objects
-                                        // The data will be skipped but the app will continue to work
+                                        // Skip non-primitive elements: some ODPT fields
+                                        // hold objects here that the app does not need
                                         null
                                     }
                                 }

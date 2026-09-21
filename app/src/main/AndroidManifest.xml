@@ -28,15 +28,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- Supplies the App Check debug secret from local.properties -->
-        <service
-            android:name="com.google.firebase.components.ComponentDiscoveryService"
-            android:exported="false"
-            tools:node="merge">
-            <meta-data
-                android:name="com.google.firebase.components:com.mytimetablemaker.AppCheckDebugSecretRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-        </service>
+        <!-- The App Check debug secret registrar is declared in
+             src/debug/AndroidManifest.xml: its class ships in the debug source
+             set only. -->
     </application>
 
 </manifest>

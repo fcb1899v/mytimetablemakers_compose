@@ -118,9 +118,8 @@ private fun getAdUnitID(context: Context): String {
         }
     }
     
-    // Fallback to the test unit ID.
-    // Adaptive banners have their own demo unit. The fixed size one (6300978111)
-    // only serves 320x50, which makes every adaptive size look like 320x50
+    // Fallback to the adaptive test unit. The fixed size one (6300978111) only
+    // serves 320x50, which makes every adaptive size look like 320x50
     Log.w("AdMobBannerView", "Using test AdMob banner unit ID; configure ADMOB_BANNER_UNIT_ID.")
     return "ca-app-pub-3940256099942544/9214589741"
 }

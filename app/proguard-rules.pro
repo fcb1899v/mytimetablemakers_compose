@@ -67,6 +67,6 @@
 # ---------------------------------------------------------------------------
 # Room (transitive: play-services-ads-api -> work-runtime 2.7.0 -> room-runtime 2.2.5)
 # ---------------------------------------------------------------------------
-# room-runtime 2.2.5 keeps RoomDatabase classes but not their members, so R8 removes the WorkDatabase_Impl no-arg constructor.
-# Startup then dies before any Activity with "Failed to create an instance of androidx.work.impl.WorkDatabase", which newer Room avoids by adding this "{ <init>(); }" spec itself.
+# room-runtime 2.2.5 keeps RoomDatabase classes but not their members, so R8 removes the WorkDatabase_Impl constructor.
+# Startup then dies with "Failed to create an instance of androidx.work.impl.WorkDatabase", which newer Room avoids by adding "{ <init>(); }" itself.
 -keep class * extends androidx.room.RoomDatabase { <init>(); }

@@ -40,11 +40,11 @@ It combines Firebase authentication and Firestore storage with railway and bus d
 
 ### Frameworks & Libraries
 
-- **Jetpack Compose**: UI, through the Compose BOM `2026.08.00`
+- **Jetpack Compose**: UI, through the Compose BOM `2026.09.00`
 - **Material 3**: `androidx.compose.material3`, with the extended icon set
 - **Navigation Compose**: `androidx.navigation:navigation-compose`
 - **Firebase**: Auth, Firestore, Analytics and App Check, pinned by the Firebase BOM `34.18.0`
-- **Google Mobile Ads**: `play-services-ads` `25.4.0`
+- **Google Mobile Ads**: `play-services-ads` `25.5.0`
 - **OkHttp `5.5.0` and Gson `2.14.0`**: HTTP and JSON for the ODPT and GTFS clients
 - **Gradle Kotlin DSL**: Build configuration, with the version catalog in `gradle/libs.versions.toml`
 
@@ -59,7 +59,7 @@ It combines Firebase authentication and Firestore storage with railway and bus d
 - A JDK that Android Gradle Plugin 9.4 supports, pointed at Gradle with `org.gradle.java.home` in your user Gradle config if it is not the one Android Studio runs
 - The build targets Java 17 and Kotlin JVM 17 (`app/build.gradle.kts`), and deliberately sets no `jvmToolchain`, so the running JDK cross compiles instead of having to be that exact version
 - Android SDK platform 37, because `compileSdk` and `targetSdk` are both 37
-- Gradle 9.6.0 through the wrapper, Android Gradle Plugin 9.4.0, Kotlin 2.4.10
+- Gradle 9.6.0 through the wrapper, Android Gradle Plugin 9.4.1, Kotlin 2.4.20
 - A Firebase project with Authentication, Firestore and App Check enabled
 - An AdMob account, for the release banner unit id
 - An ODPT API access token and challenge token, for railway and bus data
